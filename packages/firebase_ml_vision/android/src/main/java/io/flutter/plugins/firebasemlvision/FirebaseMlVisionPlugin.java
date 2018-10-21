@@ -76,8 +76,8 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
         break;
       case "TextRecognizer#detectInImageWithBytes":
         FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
-            .setWidth(1280)
-            .setHeight(960)
+            .setWidth(640)
+            .setHeight(480)
             .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();

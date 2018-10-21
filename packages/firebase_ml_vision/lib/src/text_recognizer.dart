@@ -38,6 +38,16 @@ class TextRecognizer implements FirebaseVisionDetector {
   Future<VisionText> detectInImage(FirebaseVisionImage visionImage) async {
     return processImage(visionImage);
   }
+
+  Future<VisionText> detectInImageWithBytes(Uint8List bytes) async {
+    final Map<dynamic, dynamic> reply =
+        await FirebaseVision.channel.invokeMethod(
+      'TextRecognizer#detectInImageWithBytes',
+      <String, dynamic>{'options': <String, dynamic>{}, 'bytes': bytes},
+    );
+
+    return VisionText._(reply);
+  }
 }
 
 /// Recognized text in an image.

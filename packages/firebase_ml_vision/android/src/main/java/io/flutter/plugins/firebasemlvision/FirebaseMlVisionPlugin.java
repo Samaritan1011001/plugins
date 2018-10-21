@@ -2,6 +2,8 @@ package io.flutter.plugins.firebasemlvision;
 
 import android.net.Uri;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -9,6 +11,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 /** FirebaseMlVisionPlugin */
@@ -71,6 +74,17 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
           result.error("textRecognizerIOError", e.getLocalizedMessage(), null);
         }
         break;
+      case "TextRecognizer#detectInImageWithBytes":
+        FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
+            .setWidth(1280)
+            .setHeight(960)
+            .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
+            .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
+            .build();
+        byte[] bytes = call.argument("bytes");
+
+        image = FirebaseVisionImage.fromByteArray(bytes, metadata);
+        TextRecognizer.instance.handleDetection(image, null, result);
       default:
         result.notImplemented();
     }

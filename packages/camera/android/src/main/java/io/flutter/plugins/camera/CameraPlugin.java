@@ -21,8 +21,11 @@ import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -241,7 +244,7 @@ public class CameraPlugin implements MethodCallHandler {
     }
   }
 
-  private class Camera {
+  private class Camera implements EventChannel.StreamHandler {
     private final FlutterView.SurfaceTextureEntry textureEntry;
     private CameraDevice cameraDevice;
     private CameraCaptureSession cameraCaptureSession;
@@ -256,6 +259,9 @@ public class CameraPlugin implements MethodCallHandler {
     private Size videoSize;
     private MediaRecorder mediaRecorder;
     private boolean recordingVideo;
+
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
 
     Camera(final String cameraName, final String resolutionPreset, @NonNull final Result result) {
 
@@ -662,6 +668,86 @@ public class CameraPlugin implements MethodCallHandler {
       }
     }
 
+    private void startBackgroundThread() {
+      if (mBackgroundThread == null) {
+        mBackgroundThread = new HandlerThread("CameraBackground");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+      }
+    }
+
+    private void startPreview() throws CameraAccessException {
+      closeCaptureSession();
+      startBackgroundThread();
+
+      SurfaceTexture surfaceTexture = textureEntry.surfaceTexture();
+      surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
+      captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+
+      List<Surface> surfaces = new ArrayList<>();
+
+      Surface previewSurface = new Surface(surfaceTexture);
+      surfaces.add(previewSurface);
+      captureRequestBuilder.addTarget(previewSurface);
+
+      imageReader = ImageReader.newInstance(
+          previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YV12, 2);
+
+      surfaces.add(imageReader.getSurface());
+      captureRequestBuilder.addTarget(imageReader.getSurface());
+
+      cameraDevice.createCaptureSession(
+          surfaces,
+          new CameraCaptureSession.StateCallback() {
+
+            @Override
+            public void onConfigured(@NonNull CameraCaptureSession session) {
+              if (cameraDevice == null) {
+                sendErrorEvent("The camera was closed during configuration.");
+                return;
+              }
+              try {
+                cameraCaptureSession = session;
+                captureRequestBuilder.set(
+                    CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+                cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null);
+              } catch (CameraAccessException e) {
+                sendErrorEvent(e.getMessage());
+              }
+            }
+
+            @Override
+            public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
+              sendErrorEvent("Failed to configure the camera for preview.");
+            }
+          },
+          null);
+
+      final EventChannel cameraChannel =
+          new EventChannel(registrar.messenger(), "plugins.flutter.io/camera/bytes");
+      cameraChannel.setStreamHandler(camera);
+    }
+
+    private void createImageReaderListener(final EventChannel.EventSink eventSink) {
+      imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
+        @Override
+        public void onImageAvailable(final ImageReader reader) {
+          mBackgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+              Image img = reader.acquireLatestImage();
+              final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+              byte[] bytes = new byte[buffer.remaining()];
+              buffer.get(bytes, 0, bytes.length);
+              img.close();
+              eventSink.success(bytes);
+            }
+          });
+        }
+      }, null);
+    }
+
+    /*
     private void startPreview() throws CameraAccessException {
       closeCaptureSession();
 
@@ -704,6 +790,7 @@ public class CameraPlugin implements MethodCallHandler {
           },
           null);
     }
+    */
 
     private void sendErrorEvent(String errorDescription) {
       if (eventSink != null) {
@@ -742,6 +829,16 @@ public class CameraPlugin implements MethodCallHandler {
     private void dispose() {
       close();
       textureEntry.release();
+    }
+
+    @Override
+    public void onListen(Object o, EventChannel.EventSink eventSink) {
+      createImageReaderListener(eventSink);
+    }
+
+    @Override
+    public void onCancel(Object o) {
+
     }
   }
 }

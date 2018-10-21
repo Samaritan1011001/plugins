@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -9,6 +10,24 @@ final MethodChannel _channel = const MethodChannel('plugins.flutter.io/camera')
 enum CameraLensDirection { front, back, external }
 
 enum ResolutionPreset { low, medium, high }
+
+const EventChannel _cameraEventChannel =
+    EventChannel('plugins.flutter.io/camera/bytes');
+
+class CameraEvent {
+  CameraEvent(this.bytes);
+  final Uint8List bytes;
+}
+
+Stream<CameraEvent> _cameraEvents;
+Stream<CameraEvent> get cameraEvents {
+  if (_cameraEvents == null) {
+    _cameraEvents = _cameraEventChannel
+        .receiveBroadcastStream()
+        .map((dynamic event) => CameraEvent(event));
+  }
+  return _cameraEvents;
+}
 
 /// Returns the resolution preset as a String.
 String serializeResolutionPreset(ResolutionPreset resolutionPreset) {

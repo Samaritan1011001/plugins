@@ -747,9 +747,9 @@ public class CameraPlugin implements MethodCallHandler {
       ByteBuffer uBuffer = image.getPlanes()[1].getBuffer();
       ByteBuffer vBuffer = image.getPlanes()[2].getBuffer();
 
-      int ySize = yBuffer.remaining();
-      int uSize = uBuffer.remaining();
-      int vSize = vBuffer.remaining();
+      int ySize = yBuffer.capacity();
+      int uSize = uBuffer.capacity();
+      int vSize = vBuffer.capacity();
 
       nv21 = new byte[ySize + uSize + vSize];
 

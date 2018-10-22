@@ -731,15 +731,12 @@ public class CameraPlugin implements MethodCallHandler {
       cameraChannel.setStreamHandler(camera);
     }
 
-    private void passBack(final ImageReader reader, final EventChannel.EventSink eventSink) {
-      if (!shouldPassBack) return;
-      Image img = reader.acquireLatestImage();
-      final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
-      byte[] bytes = new byte[buffer.remaining()];
-      buffer.get(bytes, 0, bytes.length);
-      img.close();
-      eventSink.success(bytes);
-      shouldPassBack = false;
+    private boolean canPassBack() {
+      if (shouldPassBack) {
+        shouldPassBack = false;
+        return true;
+      }
+      return false;
     }
 
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {
@@ -749,7 +746,13 @@ public class CameraPlugin implements MethodCallHandler {
           mBackgroundHandler.post(new Runnable() {
             @Override
             public void run() {
-              passBack(reader, eventSink);
+              if (!Camera.this.canPassBack()) return;
+              Image img = reader.acquireLatestImage();
+              final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+              byte[] bytes = new byte[buffer.remaining()];
+              buffer.get(bytes, 0, bytes.length);
+              img.close();
+              eventSink.success(bytes);
             }
           });
         }

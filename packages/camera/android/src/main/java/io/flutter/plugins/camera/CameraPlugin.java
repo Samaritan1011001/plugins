@@ -697,6 +697,7 @@ public class CameraPlugin implements MethodCallHandler {
 
     private void startPreview() throws CameraAccessException {
       closeCaptureSession();
+      stopBackgroundThread();
       startBackgroundThread();
 
       SurfaceTexture surfaceTexture = textureEntry.surfaceTexture();
@@ -780,9 +781,11 @@ public class CameraPlugin implements MethodCallHandler {
           mBackgroundHandler.post(new Runnable() {
             @Override
             public void run() {
+              boolean canPassBack = Camera.this.canPassBack();
+              Log.d("handle", "" + canPassBack);
               Image img = reader.acquireLatestImage();
 
-              if (Camera.this.canPassBack()) eventSink.success(YUV_420_888toNV21(img));
+              if (canPassBack) eventSink.success(YUV_420_888toNV21(img));
 
               img.close();
             }

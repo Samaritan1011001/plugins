@@ -37,6 +37,8 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterView;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -752,6 +754,39 @@ public class CameraPlugin implements MethodCallHandler {
       return data;
     }
 
+    private byte[] convertYUV420ToNV21(Image imgYUV420) {
+      byte[] rez;
+
+      ByteBuffer buffer0 = imgYUV420.getPlanes()[0].getBuffer();
+      ByteBuffer buffer1 = imgYUV420.getPlanes()[1].getBuffer();
+      ByteBuffer buffer2 = imgYUV420.getPlanes()[2].getBuffer();
+
+      int buffer0_size = buffer0.remaining();
+      int buffer1_size = buffer1.remaining();
+      int buffer2_size = buffer2.remaining();
+
+      byte[] buffer0_byte = new byte[buffer0_size];
+      byte[] buffer1_byte = new byte[buffer1_size];
+      byte[] buffer2_byte = new byte[buffer2_size];
+      buffer0.get(buffer0_byte, 0, buffer0_size);
+      buffer1.get(buffer1_byte, 0, buffer1_size);
+      buffer2.get(buffer2_byte, 0, buffer2_size);
+
+
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+      try {
+        outputStream.write( buffer0_byte );
+        outputStream.write( buffer1_byte );
+        outputStream.write( buffer2_byte );
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      rez = outputStream.toByteArray();
+
+      return rez;
+    }
+
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {
       imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
         @Override
@@ -766,7 +801,7 @@ public class CameraPlugin implements MethodCallHandler {
                 return;
               }
               Image img = reader.acquireLatestImage();
-              eventSink.success(convertYUV420888ToNV21(img));
+              eventSink.success(convertYUV420ToNV21(img));
               img.close();
             }
           });

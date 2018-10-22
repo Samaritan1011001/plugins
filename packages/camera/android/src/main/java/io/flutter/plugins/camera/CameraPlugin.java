@@ -777,8 +777,8 @@ public class CameraPlugin implements MethodCallHandler {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
       try {
         outputStream.write( buffer0_byte );
-        outputStream.write( buffer1_byte );
         outputStream.write( buffer2_byte );
+        outputStream.write( buffer1_byte );
       } catch (IOException e) {
         e.printStackTrace();
       }

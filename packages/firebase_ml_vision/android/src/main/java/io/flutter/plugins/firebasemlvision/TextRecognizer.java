@@ -19,13 +19,17 @@ import java.util.Map;
 public class TextRecognizer implements Detector {
   public static final TextRecognizer instance = new TextRecognizer();
 
+  private FirebaseVisionTextRecognizer textRecognizer;
+
   private TextRecognizer() {}
 
   @Override
   public void handleDetection(
       FirebaseVisionImage image, Map<String, Object> options, final MethodChannel.Result result) {
-    FirebaseVisionTextRecognizer textRecognizer =
-        FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+    if (textRecognizer == null) {
+      textRecognizer = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+    }
+
     textRecognizer
         .processImage(image)
         .addOnSuccessListener(

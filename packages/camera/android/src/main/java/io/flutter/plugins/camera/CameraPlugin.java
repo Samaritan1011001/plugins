@@ -747,7 +747,6 @@ public class CameraPlugin implements MethodCallHandler {
             @Override
             public void run() {
               boolean canPassBack = Camera.this.canPassBack();
-              Log.d("handle", "HERE" + canPassBack);
               if (!canPassBack) {
                 Image img = reader.acquireLatestImage();
                 img.close();
@@ -755,11 +754,7 @@ public class CameraPlugin implements MethodCallHandler {
               }
               Image img = reader.acquireLatestImage();
               final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
-              Log.d("handle", "" + buffer.remaining());
-              byte[] bytes = new byte[buffer.remaining()];
-              buffer.get(bytes);
-              eventSink.success(bytes);
-              Log.d("handle","Sent bytes");
+              eventSink.success(buffer.array());
               img.close();
             }
           });

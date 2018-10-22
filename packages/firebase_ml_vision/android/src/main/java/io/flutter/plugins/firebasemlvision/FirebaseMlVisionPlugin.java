@@ -88,8 +88,8 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
         break;
       case "FaceDetector#detectInImageWithBytes":
         FirebaseVisionImageMetadata faceMetadata = new FirebaseVisionImageMetadata.Builder()
-            .setWidth(640)
-            .setHeight(480)
+            .setWidth(1280)
+            .setHeight(960)
             .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();

@@ -771,7 +771,6 @@ public class CameraPlugin implements MethodCallHandler {
               boolean canPassBack = Camera.this.canPassBack();
               if (!canPassBack) {
                 Image img = reader.acquireLatestImage();
-                Log.d("handle", "" + img.getWidth() + " " + img.getHeight());
                 img.close();
                 return;
               }

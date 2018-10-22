@@ -438,9 +438,8 @@ public class CameraPlugin implements MethodCallHandler {
         if (result != null) result.error("cameraPermission", "Camera permission not granted", null);
       } else {
         try {
-          imageReader =
-              ImageReader.newInstance(
-                  captureSize.getWidth(), captureSize.getHeight(), ImageFormat.JPEG, 2);
+          ImageReader.newInstance(
+              previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YV12, 2);
           cameraManager.openCamera(
               cameraName,
               new CameraDevice.StateCallback() {
@@ -690,11 +689,10 @@ public class CameraPlugin implements MethodCallHandler {
       surfaces.add(previewSurface);
       captureRequestBuilder.addTarget(previewSurface);
 
-      imageReader = ImageReader.newInstance(
-          previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YV12, 2);
-
+      Log.d("handle", "before");
       surfaces.add(imageReader.getSurface());
       captureRequestBuilder.addTarget(imageReader.getSurface());
+      Log.d("handle", "after");
 
       cameraDevice.createCaptureSession(
           surfaces,

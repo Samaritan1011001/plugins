@@ -85,6 +85,7 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
 
         image = FirebaseVisionImage.fromByteArray(bytes, metadata);
         TextRecognizer.instance.handleDetection(image, null, result);
+        break;
       default:
         result.notImplemented();
     }

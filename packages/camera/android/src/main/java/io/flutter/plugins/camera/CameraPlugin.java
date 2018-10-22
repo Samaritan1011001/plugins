@@ -96,6 +96,7 @@ public class CameraPlugin implements MethodCallHandler {
               return;
             }
             if (activity == CameraPlugin.this.activity) {
+              Log.d("handle", "resumed");
               if (camera != null) {
                 camera.open(null);
               }
@@ -104,6 +105,7 @@ public class CameraPlugin implements MethodCallHandler {
 
           @Override
           public void onActivityPaused(Activity activity) {
+            Log.d("handle", "paused");
             if (activity == CameraPlugin.this.activity) {
               if (camera != null) {
                 camera.close();
@@ -113,6 +115,7 @@ public class CameraPlugin implements MethodCallHandler {
 
           @Override
           public void onActivityStopped(Activity activity) {
+            Log.d("handle", "stopped");
             if (activity == CameraPlugin.this.activity) {
               if (camera != null) {
                 camera.close();
@@ -853,6 +856,7 @@ public class CameraPlugin implements MethodCallHandler {
     }
 
     private void close() {
+      Log.d("handle", "close");
       closeCaptureSession();
 
       if (cameraDevice != null) {
@@ -871,6 +875,7 @@ public class CameraPlugin implements MethodCallHandler {
     }
 
     private void dispose() {
+      Log.d("handle","dispose");
       close();
       stopBackgroundThread();
       textureEntry.release();
@@ -878,6 +883,7 @@ public class CameraPlugin implements MethodCallHandler {
 
     @Override
     public void onListen(Object o, EventChannel.EventSink eventSink) {
+      Log.d("handle", "onListen");
       createImageReaderListener(eventSink);
     }
 

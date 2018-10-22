@@ -204,6 +204,11 @@ public class CameraPlugin implements MethodCallHandler {
           camera.stopVideoRecording(result);
           break;
         }
+      case "shouldPassBack":
+        {
+          camera.shouldPassBack = true;
+          break;
+        }
       case "dispose":
         {
           if (camera != null) {
@@ -262,6 +267,8 @@ public class CameraPlugin implements MethodCallHandler {
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
+
+    private boolean shouldPassBack = true;
 
     Camera(final String cameraName, final String resolutionPreset, @NonNull final Result result) {
 
@@ -689,10 +696,8 @@ public class CameraPlugin implements MethodCallHandler {
       surfaces.add(previewSurface);
       captureRequestBuilder.addTarget(previewSurface);
 
-      Log.d("handle", "before");
       surfaces.add(imageReader.getSurface());
       captureRequestBuilder.addTarget(imageReader.getSurface());
-      Log.d("handle", "after");
 
       cameraDevice.createCaptureSession(
           surfaces,
@@ -726,6 +731,16 @@ public class CameraPlugin implements MethodCallHandler {
       cameraChannel.setStreamHandler(camera);
     }
 
+    private void passBack(final Image img, final EventChannel.EventSink eventSink) {
+      if (!shouldPassBack) return;
+      final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+      byte[] bytes = new byte[buffer.remaining()];
+      buffer.get(bytes, 0, bytes.length);
+      img.close();
+      eventSink.success(bytes);
+      shouldPassBack = false;
+    }
+
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {
       imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
         @Override
@@ -734,11 +749,7 @@ public class CameraPlugin implements MethodCallHandler {
             @Override
             public void run() {
               Image img = reader.acquireLatestImage();
-              final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
-              byte[] bytes = new byte[buffer.remaining()];
-              buffer.get(bytes, 0, bytes.length);
-              img.close();
-              eventSink.success(bytes);
+              passBack(img, eventSink);
             }
           });
         }

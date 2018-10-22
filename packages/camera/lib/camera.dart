@@ -19,6 +19,10 @@ class CameraEvent {
   final Uint8List bytes;
 }
 
+void shouldPassBack() {
+  _channel.invokeMethod("shouldPassBack");
+}
+
 Stream<CameraEvent> _cameraEvents;
 Stream<CameraEvent> get cameraEvents {
   if (_cameraEvents == null) {

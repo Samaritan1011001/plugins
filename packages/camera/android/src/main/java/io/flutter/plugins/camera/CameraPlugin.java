@@ -438,7 +438,7 @@ public class CameraPlugin implements MethodCallHandler {
         if (result != null) result.error("cameraPermission", "Camera permission not granted", null);
       } else {
         try {
-          ImageReader.newInstance(
+          imageReader = ImageReader.newInstance(
               previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YV12, 2);
           cameraManager.openCamera(
               cameraName,

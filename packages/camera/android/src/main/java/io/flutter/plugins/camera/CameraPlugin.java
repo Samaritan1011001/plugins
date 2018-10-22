@@ -211,6 +211,7 @@ public class CameraPlugin implements MethodCallHandler {
       case "shouldPassBack":
         {
           camera.shouldPassBack = true;
+          Log.d("handle", "shouldPassBack");
           break;
         }
       case "dispose":
@@ -775,18 +776,14 @@ public class CameraPlugin implements MethodCallHandler {
       imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(final ImageReader reader) {
+          Log.d("handle", "onImageAvailable");
           mBackgroundHandler.post(new Runnable() {
             @Override
             public void run() {
-              boolean canPassBack = Camera.this.canPassBack();
               Image img = reader.acquireLatestImage();
 
-              if (!canPassBack) {
-                img.close();
-                return;
-              }
+              if (Camera.this.canPassBack()) eventSink.success(YUV_420_888toNV21(img));
 
-              eventSink.success(YUV_420_888toNV21(img));
               img.close();
             }
           });

@@ -746,8 +746,9 @@ public class CameraPlugin implements MethodCallHandler {
           mBackgroundHandler.post(new Runnable() {
             @Override
             public void run() {
-              Log.d("handle", "HERE" + Camera.this.canPassBack());
-              if (!Camera.this.canPassBack()) {
+              boolean canPassBack = Camera.this.canPassBack();
+              Log.d("handle", "HERE" + canPassBack);
+              if (!canPassBack) {
                 Image img = reader.acquireLatestImage();
                 img.close();
                 return;

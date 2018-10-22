@@ -1,6 +1,8 @@
 package io.flutter.plugins.firebasemlvision;
 
 import android.net.Uri;
+import android.util.Log;
+
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 
@@ -82,6 +84,7 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();
         byte[] bytes = call.argument("bytes");
+        Log.d("handle", "" + bytes.length);
 
         image = FirebaseVisionImage.fromByteArray(bytes, metadata);
         TextRecognizer.instance.handleDetection(image, null, result);
@@ -94,6 +97,7 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();
         byte[] faceBytes = call.argument("bytes");
+        Log.d("handle", "" + faceBytes.length);
 
         image = FirebaseVisionImage.fromByteArray(faceBytes, faceMetadata);
         FaceDetector.instance.handleDetection(image, options, result);

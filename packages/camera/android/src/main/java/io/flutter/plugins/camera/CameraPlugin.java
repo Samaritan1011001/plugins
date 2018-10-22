@@ -38,7 +38,6 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -684,6 +683,14 @@ public class CameraPlugin implements MethodCallHandler {
       }
     }
 
+    private void stopBackgroundThread() {
+      if (mBackgroundThread != null) {
+        mBackgroundThread.quitSafely();
+        mBackgroundThread = null;
+        mBackgroundHandler = null;
+      }
+    }
+
     private void startPreview() throws CameraAccessException {
       closeCaptureSession();
       startBackgroundThread();
@@ -769,13 +776,13 @@ public class CameraPlugin implements MethodCallHandler {
             @Override
             public void run() {
               boolean canPassBack = Camera.this.canPassBack();
+              Image img = reader.acquireLatestImage();
+
               if (!canPassBack) {
-                Image img = reader.acquireLatestImage();
-                Log.d("handle", "" + img.getWidth() + " " + img.getHeight());
                 img.close();
                 return;
               }
-              Image img = reader.acquireLatestImage();
+
               eventSink.success(YUV_420_888toNV21(img));
               img.close();
             }
@@ -865,6 +872,7 @@ public class CameraPlugin implements MethodCallHandler {
 
     private void dispose() {
       close();
+      stopBackgroundThread();
       textureEntry.release();
     }
 

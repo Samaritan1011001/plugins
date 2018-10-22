@@ -747,6 +747,7 @@ public class CameraPlugin implements MethodCallHandler {
             @Override
             public void run() {
               Log.d("handle", "CAMERA");
+              Log.d("handle", "" + !Camera.this.canPassBack());
               if (!Camera.this.canPassBack()) return;
               Image img = reader.acquireLatestImage();
               final ByteBuffer buffer = img.getPlanes()[0].getBuffer();

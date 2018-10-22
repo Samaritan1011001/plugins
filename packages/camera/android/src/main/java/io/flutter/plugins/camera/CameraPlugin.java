@@ -446,7 +446,7 @@ public class CameraPlugin implements MethodCallHandler {
       } else {
         try {
           imageReader = ImageReader.newInstance(
-              previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YV12, 2);
+              previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YUV_420_888, 2);
           cameraManager.openCamera(
               cameraName,
               new CameraDevice.StateCallback() {
@@ -739,6 +739,19 @@ public class CameraPlugin implements MethodCallHandler {
       return false;
     }
 
+    private byte[] convertYUV420888ToNV21(Image imgYUV420) {
+      // Converting YUV_420_888 data to NV21.
+      byte[] data;
+      ByteBuffer buffer0 = imgYUV420.getPlanes()[0].getBuffer();
+      ByteBuffer buffer2 = imgYUV420.getPlanes()[2].getBuffer();
+      int buffer0_size = buffer0.remaining();
+      int buffer2_size = buffer2.remaining();
+      data = new byte[buffer0_size + buffer2_size];
+      buffer0.get(data, 0, buffer0_size);
+      buffer2.get(data, buffer0_size, buffer2_size);
+      return data;
+    }
+
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {
       imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
         @Override
@@ -753,8 +766,7 @@ public class CameraPlugin implements MethodCallHandler {
                 return;
               }
               Image img = reader.acquireLatestImage();
-              final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
-              eventSink.success(buffer.array());
+              eventSink.success(convertYUV420888ToNV21(img));
               img.close();
             }
           });

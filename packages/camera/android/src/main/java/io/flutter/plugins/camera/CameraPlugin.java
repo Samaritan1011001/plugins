@@ -778,10 +778,7 @@ public class CameraPlugin implements MethodCallHandler {
             public void run() {
               boolean canPassBack = Camera.this.canPassBack();
               Image img = reader.acquireLatestImage();
-              if (img == null) {
-                Log.d("handle", "img is null?");
-                return;
-              }
+              if (img == null) return;
 
               if (canPassBack) eventSink.success(YUV_420_888toNV21(img));
 

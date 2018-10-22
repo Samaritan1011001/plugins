@@ -38,7 +38,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterView;
 
-import java.io.ByteArrayOutputStream;
+//import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -685,6 +685,7 @@ public class CameraPlugin implements MethodCallHandler {
     }
 
     private void startPreview() throws CameraAccessException {
+      Log.d("handle", "preview");
       closeCaptureSession();
       startBackgroundThread();
 
@@ -754,6 +755,7 @@ public class CameraPlugin implements MethodCallHandler {
       return data;
     }
 
+    /*
     private byte[] convertYUV420ToNV21(Image imgYUV420) {
       byte[] rez;
 
@@ -786,6 +788,7 @@ public class CameraPlugin implements MethodCallHandler {
 
       return rez;
     }
+    */
 
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {
       imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
@@ -794,7 +797,7 @@ public class CameraPlugin implements MethodCallHandler {
           mBackgroundHandler.post(new Runnable() {
             @Override
             public void run() {
-              Log.d("handle","HERE");
+              Log.d("handle", "here");
               boolean canPassBack = Camera.this.canPassBack();
               if (!canPassBack) {
                 Image img = reader.acquireLatestImage();

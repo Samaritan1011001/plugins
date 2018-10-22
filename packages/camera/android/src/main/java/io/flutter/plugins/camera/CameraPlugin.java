@@ -741,7 +741,7 @@ public class CameraPlugin implements MethodCallHandler {
       return false;
     }
 
-    private static byte[] YUV_420_888toNV21(Image image) {
+    private byte[] YUV_420_888toNV21(Image image) {
       byte[] nv21;
       ByteBuffer yBuffer = image.getPlanes()[0].getBuffer();
       ByteBuffer uBuffer = image.getPlanes()[1].getBuffer();

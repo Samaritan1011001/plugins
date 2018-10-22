@@ -732,14 +732,14 @@ public class CameraPlugin implements MethodCallHandler {
     }
 
     private void passBack(final ImageReader reader, final EventChannel.EventSink eventSink) {
-      if (!shouldPassBack) return;
+      //if (!shouldPassBack) return;
       Image img = reader.acquireLatestImage();
       final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
       byte[] bytes = new byte[buffer.remaining()];
       buffer.get(bytes, 0, bytes.length);
       img.close();
       eventSink.success(bytes);
-      shouldPassBack = false;
+      //shouldPassBack = false;
     }
 
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {

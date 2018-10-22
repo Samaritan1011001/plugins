@@ -747,9 +747,11 @@ public class CameraPlugin implements MethodCallHandler {
       ByteBuffer uBuffer = image.getPlanes()[1].getBuffer();
       ByteBuffer vBuffer = image.getPlanes()[2].getBuffer();
 
-      int ySize = yBuffer.capacity();
-      int uSize = uBuffer.capacity();
-      int vSize = vBuffer.capacity();
+      Log.d("handle", "" + yBuffer.remaining() + " " + uBuffer.remaining() + " " + vBuffer.remaining());
+
+      int ySize = yBuffer.remaining();
+      int uSize = uBuffer.remaining();
+      int vSize = vBuffer.remaining();
 
       nv21 = new byte[ySize + uSize + vSize];
 
@@ -775,6 +777,7 @@ public class CameraPlugin implements MethodCallHandler {
                 return;
               }
               Image img = reader.acquireLatestImage();
+              Log.d("handle", "" + img.getWidth() + " " + img.getHeight());
               eventSink.success(YUV_420_888toNV21(img));
               img.close();
             }

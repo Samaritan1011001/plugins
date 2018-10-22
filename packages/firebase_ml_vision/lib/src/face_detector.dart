@@ -62,6 +62,29 @@ class FaceDetector extends FirebaseVisionDetector {
 
     return faces;
   }
+
+  Future<List<Face>> detectInImageWithBytes(Uint8List bytes) async {
+    final List<dynamic> reply = await FirebaseVision.channel.invokeMethod(
+      'FaceDetector#detectInImageWithBytes',
+      <String, dynamic>{
+        'options': <String, dynamic>{
+          'enableClassification': options.enableClassification,
+          'enableLandmarks': options.enableLandmarks,
+          'enableTracking': options.enableTracking,
+          'minFaceSize': options.minFaceSize,
+          'mode': _enumToString(options.mode),
+        },
+        'bytes': bytes
+      },
+    );
+
+    final List<Face> faces = <Face>[];
+    for (dynamic data in reply) {
+      faces.add(Face._(data));
+    }
+
+    return faces;
+  }
 }
 
 /// Immutable options for configuring features of [FaceDetector].

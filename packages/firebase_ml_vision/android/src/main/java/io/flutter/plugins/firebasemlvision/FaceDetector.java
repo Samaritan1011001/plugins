@@ -18,20 +18,19 @@ import java.util.Map;
 class FaceDetector implements Detector {
   public static final FaceDetector instance = new FaceDetector();
 
+  private FirebaseVisionFaceDetector faceDetector;
+
   private FaceDetector() {}
 
   @Override
   public void handleDetection(
       FirebaseVisionImage image, Map<String, Object> options, final MethodChannel.Result result) {
 
-    FirebaseVisionFaceDetector detector;
-    if (options == null) {
-      detector = FirebaseVision.getInstance().getVisionFaceDetector();
-    } else {
-      detector = FirebaseVision.getInstance().getVisionFaceDetector(parseOptions(options));
+    if (faceDetector == null) {
+      faceDetector = FirebaseVision.getInstance().getVisionFaceDetector(parseOptions(options));
     }
 
-    detector
+    faceDetector
         .detectInImage(image)
         .addOnSuccessListener(
             new OnSuccessListener<List<FirebaseVisionFace>>() {

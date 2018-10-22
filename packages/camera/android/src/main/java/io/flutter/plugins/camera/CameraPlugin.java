@@ -754,10 +754,12 @@ public class CameraPlugin implements MethodCallHandler {
               }
               Image img = reader.acquireLatestImage();
               final ByteBuffer buffer = img.getPlanes()[0].getBuffer();
+              Log.d("handle", "" + buffer.remaining());
               byte[] bytes = new byte[buffer.remaining()];
-              buffer.get(bytes, 0, bytes.length);
+              buffer.get(bytes);
+              eventSink.success(bytesg);
+              Log.d("handle","Sent bytes");
               img.close();
-              eventSink.success(bytes);
             }
           });
         }

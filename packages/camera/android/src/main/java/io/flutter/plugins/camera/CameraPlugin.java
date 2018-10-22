@@ -741,53 +741,25 @@ public class CameraPlugin implements MethodCallHandler {
       return false;
     }
 
-    private byte[] convertYUV420888ToNV21(Image imgYUV420) {
-      // Converting YUV_420_888 data to NV21.
-      byte[] data;
-      ByteBuffer buffer0 = imgYUV420.getPlanes()[0].getBuffer();
-      ByteBuffer buffer2 = imgYUV420.getPlanes()[2].getBuffer();
-      int buffer0_size = buffer0.remaining();
-      int buffer2_size = buffer2.remaining();
-      data = new byte[buffer0_size + buffer2_size];
-      buffer0.get(data, 0, buffer0_size);
-      buffer2.get(data, buffer0_size, buffer2_size);
-      return data;
+    private static byte[] YUV_420_888toNV21(Image image) {
+      byte[] nv21;
+      ByteBuffer yBuffer = image.getPlanes()[0].getBuffer();
+      ByteBuffer uBuffer = image.getPlanes()[1].getBuffer();
+      ByteBuffer vBuffer = image.getPlanes()[2].getBuffer();
+
+      int ySize = yBuffer.remaining();
+      int uSize = uBuffer.remaining();
+      int vSize = vBuffer.remaining();
+
+      nv21 = new byte[ySize + uSize + vSize];
+
+      //U and V are swapped
+      yBuffer.get(nv21, 0, ySize);
+      vBuffer.get(nv21, ySize, vSize);
+      uBuffer.get(nv21, ySize + vSize, uSize);
+
+      return nv21;
     }
-
-
-    private byte[] convertYUV420ToNV21(Image imgYUV420) {
-      byte[] rez;
-
-      ByteBuffer buffer0 = imgYUV420.getPlanes()[0].getBuffer();
-      ByteBuffer buffer1 = imgYUV420.getPlanes()[1].getBuffer();
-      ByteBuffer buffer2 = imgYUV420.getPlanes()[2].getBuffer();
-
-      int buffer0_size = buffer0.remaining();
-      int buffer1_size = buffer1.remaining();
-      int buffer2_size = buffer2.remaining();
-
-      byte[] buffer0_byte = new byte[buffer0_size];
-      byte[] buffer1_byte = new byte[buffer1_size];
-      byte[] buffer2_byte = new byte[buffer2_size];
-      buffer0.get(buffer0_byte, 0, buffer0_size);
-      buffer1.get(buffer1_byte, 0, buffer1_size);
-      buffer2.get(buffer2_byte, 0, buffer2_size);
-
-
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-      try {
-        outputStream.write( buffer0_byte );
-        outputStream.write( buffer2_byte );
-        outputStream.write( buffer1_byte );
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      rez = outputStream.toByteArray();
-
-      return rez;
-    }
-
 
     private void createImageReaderListener(final EventChannel.EventSink eventSink) {
       imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
@@ -803,7 +775,7 @@ public class CameraPlugin implements MethodCallHandler {
                 return;
               }
               Image img = reader.acquireLatestImage();
-              eventSink.success(convertYUV420ToNV21(img));
+              eventSink.success(YUV_420_888toNV21(img));
               img.close();
             }
           });

@@ -801,7 +801,7 @@ public class CameraPlugin implements MethodCallHandler {
                 return;
               }
               Image img = reader.acquireLatestImage();
-              eventSink.success(convertYUV420ToNV21(img));
+              eventSink.success(convertYUV420888ToNV21(img));
               img.close();
             }
           });

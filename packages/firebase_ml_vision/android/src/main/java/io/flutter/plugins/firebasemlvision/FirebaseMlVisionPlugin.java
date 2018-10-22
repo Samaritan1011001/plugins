@@ -84,9 +84,8 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();
         byte[] bytes = call.argument("bytes");
-        Log.d("handle", "" + bytes.length);
 
-        image = FirebaseVisionImage.fromByteArray(bytes, metadata);
+        image = FirebaseVisionImage.fromByteBuffer(ByteBuffer.allocate(bytes.length).put(bytes), metadata);
         TextRecognizer.instance.handleDetection(image, null, result);
         break;
       case "FaceDetector#detectInImageWithBytes":
@@ -97,9 +96,8 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();
         byte[] faceBytes = call.argument("bytes");
-        Log.d("handle", "" + faceBytes.length);
 
-        image = FirebaseVisionImage.fromByteArray(faceBytes, faceMetadata);
+        image = FirebaseVisionImage.fromByteBuffer(ByteBuffer.allocate(faceBytes.length).put(faceBytes), faceMetadata);
         FaceDetector.instance.handleDetection(image, options, result);
         break;
       default:

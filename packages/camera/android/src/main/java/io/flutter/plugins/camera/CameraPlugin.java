@@ -614,7 +614,7 @@ public class CameraPlugin implements MethodCallHandler {
 
         SurfaceTexture surfaceTexture = textureEntry.surfaceTexture();
         surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
-        captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
 
         List<Surface> surfaces = new ArrayList<>();
 

@@ -757,7 +757,7 @@ public class CameraPlugin implements MethodCallHandler {
               Log.d("handle", "" + buffer.remaining());
               byte[] bytes = new byte[buffer.remaining()];
               buffer.get(bytes);
-              eventSink.success(bytesg);
+              eventSink.success(bytes);
               Log.d("handle","Sent bytes");
               img.close();
             }

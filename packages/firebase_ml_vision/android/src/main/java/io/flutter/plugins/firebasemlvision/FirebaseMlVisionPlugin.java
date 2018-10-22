@@ -78,7 +78,7 @@ public class FirebaseMlVisionPlugin implements MethodCallHandler {
         FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
             .setWidth(640)
             .setHeight(480)
-            .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
+            .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
             .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
             .build();
         byte[] bytes = call.argument("bytes");

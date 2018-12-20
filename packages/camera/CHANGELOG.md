@@ -1,3 +1,8 @@
+## 0.2.7
+
+* Add access to the image stream from Dart.
+* Use `cameraController.startImageStream(listener)` to process the images.
+
 ## 0.2.6
 
 * Update the camera to use the physical device's orientation instead of the UI
